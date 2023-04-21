@@ -1,1 +1,1 @@
-from .discord_notif import *
+from .discord_notif import send_message

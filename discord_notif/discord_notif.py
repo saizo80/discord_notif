@@ -1,128 +1,47 @@
-#!/usr/bin/env python3
-from typing import Tuple
-from discord_webhook import DiscordWebhook, DiscordEmbed
+#!/usr/bin/env python
+import json
 import os
 from datetime import datetime
-import sys
-import argparse
+
 import sai_logging as log
-import json
+from discord_webhook import DiscordEmbed, DiscordWebhook
 
 
-def __get_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Send a message to discord")
-    parser.add_argument(
-        "-o",
-        "--option",
-        help="Option to send to discord webhook",
-        required=False,
-        choices=["cron", "alert", "signout", "test"],
-    )
-    parser.add_argument(
-        "-f", "--file", help="File to send to discord webhook", required=False
-    )
-    parser.add_argument(
-        "--filter",
-        help="Filter the message to remove cli formatting",
-        required=False,
-        action="store_true",
-    )
-    parser.add_argument(
-        "-l",
-        "--log",
-        help="Log file to print output to",
-        required=False,
-        default=None,
-    )
-    parser.add_argument(
-        "-m",
-        "--message",
-        help="Message to send to discord webhook",
-        required=False,
-    )
-    parser.add_argument(
-        "-s",
-        "--status",
-        help="Status of the script to send to discord webhook",
-        required=False,
-        type=int,
-        default=None
-    )
-    parser.add_argument(
-        "-t",
-        "--title",
-        help="Title of the message to send to discord webhook",
-        required=False,
-        default=None,
-    )
-    parser.add_argument(
-        "-u",
-        "--url",
-        help="URL of the webhook to send to",
-        required=False,
-        default=None,
-        type=str,
-    )
-    return parser.parse_args()
-
-
-def __get_script_input() -> str:
-    if not sys.stdin.isatty():
-        temp_input = sys.stdin.read()
-        if not temp_input:
-            return None
-        return temp_input if not temp_input[-1] == "\n" else temp_input[:-1]
-    return None
-
-
-def __setup_log() -> None:
+def _setup_log() -> log.Logger:
     path = "/var/log/discord_notify.log"
-    global logging
     try:
         logging = log.Logger(
             log_file_name=path,
             log_level=log.INFO,
         )
-    except PermissionError:
-        path = "./discord_notify.log"
-        logging = log.Logger(
-            log_file_name=path,
-            log_level=log.INFO,
-        )
-    except FileNotFoundError:
+    except PermissionError or FileNotFoundError:
         path = "./discord_notify.log"
         logging = log.Logger(
             log_file_name=path,
             log_level=log.INFO,
         )
 
+    return logging
 
-def __filter_message(message: str) -> Tuple[str, str]:
+
+def _filter_message(message: str) -> str:
     import re
 
-    original_message = message
-    return (re.sub(r"\x1b\[[0-9;]*m", "", message), original_message)
+    return re.sub(r"\x1b\[[0-9;]*m", "", message)
 
 
-def __get_url(option: str) -> str:
+def _get_url(option: str) -> str:
     with open("/etc/discord.json", "r") as f:
         urls: dict = json.load(f)
-    if option == "cron":
-        return urls.get("discord_cron_url")
-    elif option == "alert":
-        return urls.get("discord_alert_url")
-    elif option == "signout":
-        return urls.get("discord_signout_url")
-    elif option == "test":
-        return urls.get("discord_test_url")
-    else:
-        logging.error("No option selected")
-        sys.exit(1)
+    try:
+        return urls[option.lower()]
+    except KeyError:
+        raise KeyError(f"option {option} not found in /etc/discord.json")
 
 
-def __build_webhook(option: str, file: str, pass_url: str) -> DiscordWebhook:
+def _build_webhook(option: str, file: str, pass_url: str) -> DiscordWebhook:
     if not pass_url:
-        url = __get_url(option)
+        url = _get_url(option)
     else:
         url = pass_url
     webhook = DiscordWebhook(url=url, rate_limit_retry=True)
@@ -132,24 +51,24 @@ def __build_webhook(option: str, file: str, pass_url: str) -> DiscordWebhook:
     return webhook
 
 
-def __build_embed(option: str, title: str, status: int, message: str) -> DiscordEmbed:
+def _build_embed(option: str, title: str, status: int, message: str) -> DiscordEmbed:
     if option != "alert":
         if status == 0:
-            color = 65280 #green
+            color = 65280  # green
             stat = "```diff\n+success```"
         elif not status:
-            color = 8421504 #gray
+            color = 8421504  # gray
             stat = None
         else:
-            color = 16711680 #red
+            color = 16711680  # red
             stat = "```diff\n-failure```"
     else:
         color = 16776960
         stat = "alert"
-    
+
     message_split = None
     if len(message) > 1024 and title != "login notification":
-        message = message.replace('```bash', '').replace('```', '')
+        message = message.replace("```bash", "").replace("```", "")
         # split message into multiple fields
         message_split = []
         counter = 0
@@ -157,7 +76,7 @@ def __build_embed(option: str, title: str, status: int, message: str) -> Discord
             message_split.append(
                 {
                     "name": f"output ({counter})",
-                    "value": '```bash\n' + message[:1012] + '```',
+                    "value": "```bash\n" + message[:1012] + "```",
                 }
             )
             message = message[1012:]
@@ -193,11 +112,16 @@ def __build_embed(option: str, title: str, status: int, message: str) -> Discord
             if key != "ipinfolink":
                 try:
                     value = json.dumps(value, indent=2)
-                    value = f'```json\n{value}\n```'
+                    value = f"```json\n{value}\n```"
                 except TypeError:
                     pass
             fields.append({"name": key, "value": value})
-        fields.append({"name": "time (cdt)", "value": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")})
+        fields.append(
+            {
+                "name": "time (cdt)",
+                "value": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+            }
+        )
 
     return DiscordEmbed(
         title=title,
@@ -207,11 +131,11 @@ def __build_embed(option: str, title: str, status: int, message: str) -> Discord
     )
 
 
-def __build_message(message: str) -> str:
+def _build_message(message: str) -> str:
     return f"```bash\n{message}\n```"
 
 
-def __send_message(webhook: DiscordWebhook, embed: DiscordEmbed):
+def _send_message(webhook: DiscordWebhook, embed: DiscordEmbed):
     webhook.add_embed(embed)
     return webhook.execute()
 
@@ -219,11 +143,12 @@ def __send_message(webhook: DiscordWebhook, embed: DiscordEmbed):
 def send_message(
     message: str,
     option: str,
-    status: int = None,
-    title: str = None,
-    file: str = None,
+    status: int | None = None,
+    title: str | None = None,
+    file: str | None = None,
     filter: bool = False,
-    url: str = None,
+    url: str | None = None,
+    logging: log.Logger | None = None,
 ) -> str:
     """Send message to discord webhook
     Arguments:
@@ -234,80 +159,47 @@ def send_message(
         title {str} -- Title of the message to send to discord webhook (default: {None})
         file {str} -- File to send to discord webhook (default: {None})
         filter {bool} -- Filter message to remove color (default: {False})
+        url {str} -- Url to send to discord webhook (default: {None})
+        logging {log.Logger} -- Logger to use (default: {None})
 
     Returns:
         str -- Status of the message sent to discord webhook"""
-    __setup_log()
-    logging.info(f'Sending to discord webhook: "{option}"')
-    if not option:
-        logging.error("No option selected")
-        raise ValueError("No option selected")
+    try:
+        if not logging:
+            logging = _setup_log()
 
-    if file and not os.path.isfile(file):
-        logging.error(f"File {file} does not exist")
-        raise FileNotFoundError(f"File {file} does not exist")
+        logging.info(f'Sending to discord webhook: "{option}"')
+        if not option and not url:
+            logging.error("no option selected and no url passed")
+            raise ValueError("no option selected and no url passed")
 
-    if not message:
-        logging.error("No message to send to discord")
-        raise ValueError("No message to send to discord")
+        if file and not os.path.isfile(file):
+            logging.error(f"File {file} does not exist")
+            raise FileNotFoundError(f"File {file} does not exist")
 
-    if filter:
-        (message, original_message) = __filter_message(message)
+        if not message:
+            logging.error("No message to send to discord")
+            raise ValueError("No message to send to discord")
 
-    if title != "login notification":
-        message = __build_message(message)
-    webhook = __build_webhook(option, file, url)
-    embed = __build_embed(option, title, status, message)
-    send_status = __send_message(webhook, embed)
+        if filter:
+            message = _filter_message(message)
 
-    if send_status.status_code == 200:
-        logging.info(f"Message sent to discord webhook: {send_status}")
-    elif send_status.status_code == 429:
-        logging.error(f"Discord webhook rate limit reached: {send_status}")
-    elif send_status.status_code == 400:
-        logging.error(f"Discord webhook bad request: {send_status}")
-    else:
-        logging.error(f"Discord webhook error: {send_status}")
+        if title != "login notification":
+            message = _build_message(message)
+        webhook = _build_webhook(option, file, url)
+        embed = _build_embed(option, title, status, message)
+        send_status = _send_message(webhook, embed)
 
-    return send_status
+        if send_status.status_code == 200:
+            logging.info(f"Message sent to discord webhook: {send_status}")
+        elif send_status.status_code == 429:
+            logging.error(f"Discord webhook rate limit reached: {send_status}")
+        elif send_status.status_code == 400:
+            logging.error(f"Discord webhook bad request: {send_status}")
+        else:
+            logging.error(f"Discord webhook error: {send_status}")
 
-
-def main() -> None:
-    args = __get_arguments()
-    __setup_log()
-    if args.file and not os.path.isfile(args.file):
-        logging.error(f"File {args.file} does not exist")
-        sys.exit(1)
-
-    script_input = __get_script_input()
-    if not script_input and not args.message:
-        logging.error("No message to send to discord")
-        sys.exit(1)
-    message = script_input if not args.message else args.message
-
-    if args.filter:
-        (message, original_message) = __filter_message(message)
-        filtered = True
-    else:
-        filtered = False
-
-    if args.title != "login notification":
-        message = __build_message(message)
-
-    webhook = __build_webhook(args.option, args.file, args.url)
-    embed = __build_embed(args.option, args.title, args.status, message)
-    send_status = __send_message(webhook, embed)
-
-    if send_status.status_code == 200:
-        logging.info(f"Message sent to discord webhook: {send_status}")
-    elif send_status.status_code == 429:
-        logging.error(f"Discord webhook rate limit reached: {send_status}")
-    elif send_status.status_code == 400:
-        logging.error(f"Discord webhook bad request: {send_status}")
-    else:
-        logging.error(f"Discord webhook error: {send_status}")
-    
-
-
-if __name__ == "__main__":
-    main()
+        return send_status
+    except Exception as e:
+        logging.error(f"error sending message to discord webhook -> {e}")
+        raise e
