@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=67", "wheel>=0.40.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,13 +14,18 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Operating System :: OS Independent",
 ]
-dynamic = ["dependencies"]
+dependencies = [
+    "certifi==2022.12.7",
+    "charset-normalizer==3.1.0",
+    "discord-webhook==1.1.0",
+    "idna==3.4",
+    "sai_logging @ git+https://git.saizo.gay/saizo/sai_logging.git",
+    "requests==2.28.2",
+    "urllib3==1.26.15",
+]
 
 [project.scripts]
 discord_notif = "discord_notif.__main__:main"
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 homepage = "https://git.saizo.gay/saizo/discord_notif"
