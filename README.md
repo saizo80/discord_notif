@@ -10,10 +10,6 @@ used for sending cron script output and status.
 
 ## installation
 
-ensure `wheel` module is installed with `pip install wheel`
-
-then:
-
 `pip install git+https://git.saizo.gay/saizo/discord_notif`
 
 ## use
