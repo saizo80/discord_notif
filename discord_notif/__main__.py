@@ -16,6 +16,14 @@ def _get_script_input() -> str:
 
 def main() -> None:
     args = get_arguments()
+    if args.version:
+        import pkg_resources
+
+        print(
+            "discord_notif version:",
+            pkg_resources.get_distribution("discord_notif").version,
+        )
+        sys.exit(0)
     if not args.message:
         message = _get_script_input()
         if not message:

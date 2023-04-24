@@ -64,4 +64,12 @@ def get_arguments() -> argparse.Namespace:
         default=None,
         type=str,
     )
+    parser.add_argument(
+        "-V",
+        "--version",
+        help="Print version and exit",
+        required=False,
+        action="store_true",
+        default=False,
+    )
     return parser.parse_args()

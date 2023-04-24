@@ -18,23 +18,20 @@ used for sending cron script output and status.
 from discord_notif import send_message
 
 status = send_message(
-    message='message to send',
-    option='option',
-    status=0,
-    title='embed title',
-    file='/path/to/attached/file',
-    filter=False,
-    url='discord webhook url',
+    message='message to send', # required
+    option='option', # optional
+    status=0, # optional
+    title='embed title', # optional
+    file='/path/to/attached/file', # optional
+    filter=False, # optional
+    url='discord webhook url', # optional
 )
+
 
 print(status)
 ```
 
-the options included are:
-> cron  
-> signout  
-> alert  
-> test
+while `option` and `url` are both optional, **at least** one should be passed. url takes precedence over option
 
 this draws from a json file at `/etc/discord.json` which should look like
 

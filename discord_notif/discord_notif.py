@@ -142,7 +142,7 @@ def _send_message(webhook: DiscordWebhook, embed: DiscordEmbed):
 
 def send_message(
     message: str,
-    option: str,
+    option: str | None = None,
     status: int | None = None,
     title: str | None = None,
     file: str | None = None,
@@ -168,8 +168,11 @@ def send_message(
         if not logging:
             logging = _setup_log()
 
-        logging.info(f'Sending to discord webhook: "{option}"')
-        if not option and not url:
+        if url: 
+            logging.info(f'Sending to discord webhook: "{url}"')
+        elif option:
+            logging.info(f'Sending to discord webhook: "{option}"')
+        else:
             logging.error("no option selected and no url passed")
             raise ValueError("no option selected and no url passed")
 
