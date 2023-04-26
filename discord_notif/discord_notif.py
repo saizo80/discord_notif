@@ -14,7 +14,7 @@ def _setup_log() -> log.Logger:
             log_file_name=path,
             log_level=log.INFO,
         )
-    except PermissionError or FileNotFoundError:
+    except (PermissionError, FileNotFoundError):
         path = "./discord_notify.log"
         logging = log.Logger(
             log_file_name=path,
