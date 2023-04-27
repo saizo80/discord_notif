@@ -19,7 +19,7 @@ pip install discord_notif
 if you have not then you will need to add it as an extra index in the install statement:
 
 ```bash
-pip install --extra-index-url https://git.saizo.gay/api/packages/saizo/pypi/simple/ sai-logging
+pip install --extra-index-url https://git.saizo.gay/api/packages/saizo/pypi/simple/ discord_notif
 ```
 
 ## use
