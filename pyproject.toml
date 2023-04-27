@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "discord_notif"
-version = "0.2.2"
+version = "0.2.3"
 authors = [{name="saizo", email="saizo@simplemail.is"}]
 description = "importable script to send messages to discord webhooks"
 readme = "README.md"
@@ -19,7 +19,7 @@ dependencies = [
     "charset-normalizer==3.1.0",
     "discord-webhook==1.1.0",
     "idna==3.4",
-    "sai_logging @ git+https://git.saizo.gay/saizo/sai_logging.git",
+    "sai_logging==0.2.0",
     "requests==2.28.2",
     "urllib3==1.26.15",
 ]
