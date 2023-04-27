@@ -6,6 +6,8 @@ from datetime import datetime
 import sai_logging as log
 from discord_webhook import DiscordEmbed, DiscordWebhook
 
+from .err import SendError
+
 
 def _setup_log() -> log.Logger:
     path = "/var/log/discord_notify.log"
@@ -168,7 +170,7 @@ def send_message(
         if not logging:
             logging = _setup_log()
 
-        if url: 
+        if url:
             logging.info(f'Sending to discord webhook: "{url}"')
         elif option:
             logging.info(f'Sending to discord webhook: "{option}"')
@@ -193,16 +195,20 @@ def send_message(
         embed = _build_embed(option, title, status, message)
         send_status = _send_message(webhook, embed)
 
-        if send_status.status_code == 200:
-            logging.info(f"Message sent to discord webhook: {send_status}")
-        elif send_status.status_code == 429:
-            logging.error(f"Discord webhook rate limit reached: {send_status}")
-        elif send_status.status_code == 400:
-            logging.error(f"Discord webhook bad request: {send_status}")
-        else:
-            logging.error(f"Discord webhook error: {send_status}")
+        match send_status.status_code:
+            case 200 | 204:
+                logging.info(f"Message sent to discord webhook: {send_status}")
+            case 429:
+                raise SendError("Discord webook rate limit reached", 429)
+            case 400:
+                raise SendError("Discord webhook bad request", 400)
+            case _:
+                raise SendError("Discord webhook error", send_status.status_code)
 
         return send_status
+    except SendError as e:
+        logging.error(f"{e.code} -> {e.message}")
+        raise e
     except Exception as e:
         logging.error(f"error sending message to discord webhook -> {e}")
         raise e

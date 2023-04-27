@@ -1,10 +1,12 @@
 import argparse
 import json
 
+
 def _get_options() -> str:
     with open("/etc/discord.json", "r") as f:
         options: dict = json.load(f)
     return f'{{{", ".join(options.keys())}}}'
+
 
 def get_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Send a message to discord")

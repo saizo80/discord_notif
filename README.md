@@ -10,7 +10,17 @@ used for sending cron script output and status.
 
 ## installation
 
-`pip install git+https://git.saizo.gay/saizo/discord_notif`
+if you have added git.saizo.gay to your pip index for either user or global (see package [instructions](https://git.saizo.gay/saizo/-/packages/pypi/discord-notif/)):
+
+```bash
+pip install discord_notif
+```
+
+if you have not then you will need to add it as an extra index in the install statement:
+
+```bash
+pip install --extra-index-url https://git.saizo.gay/api/packages/saizo/pypi/simple/ sai-logging
+```
 
 ## use
 
@@ -45,22 +55,21 @@ this draws from a json file at `/etc/discord.json` which should look like
 
 ## terminal use
 
-the script can also be called from the terminal. the functions are the same, but to see the argument flags use `discord_notif.py -h`
+the script can also be called from the terminal. the functions are the same, but to see the argument flags use `discord_notif -h`
 
 it will give this information:
 
 ```txt
-usage: discord_notif.py [-h] [-o {cron,alert,signout,test}] [-f FILE] [--filter] [-l LOG] [-m MESSAGE] [-s STATUS] [-t TITLE] [-u URL]
+usage: discord_notif [-h] [-o OPTION] [-f FILE] [--filter] [-m MESSAGE] [-s STATUS] [-t TITLE] [-u URL] [-V]
 
 Send a message to discord
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -o {cron,alert,signout,test}, --option {cron,alert,signout,test}
+  -o OPTION, --option OPTION
                         Option to send to discord webhook
   -f FILE, --file FILE  File to send to discord webhook
   --filter              Filter the message to remove cli formatting
-  -l LOG, --log LOG     Log file to print output to
   -m MESSAGE, --message MESSAGE
                         Message to send to discord webhook
   -s STATUS, --status STATUS
@@ -68,6 +77,7 @@ optional arguments:
   -t TITLE, --title TITLE
                         Title of the message to send to discord webhook
   -u URL, --url URL     URL of the webhook to send to
+  -V, --version         Print version and exit
 ```
 
-the message can be specified using the `-m` or `--message` flags, or it can be piped into the script from another script like `script1.sh | discord_notif.py`
+the message can be specified using the `-m` or `--message` flags, or it can be piped into the script from another script like `script1.sh | discord_notif`

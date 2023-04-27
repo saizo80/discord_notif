@@ -2,6 +2,6 @@ certifi==2022.12.7
 charset-normalizer==3.1.0
 discord-webhook==1.1.0
 idna==3.4
-sai_logging @ git+https://git.saizo.gay/saizo/sai_logging.git
+sai_logging==0.2.0
 requests==2.28.2
 urllib3==1.26.15
