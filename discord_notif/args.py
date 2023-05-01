@@ -61,6 +61,14 @@ def get_arguments() -> argparse.Namespace:
         type=str,
     )
     parser.add_argument(
+        "-l",
+        "--log",
+        help="log file to output to",
+        required=False,
+        default=None,
+        type=str,
+    )
+    parser.add_argument(
         "-V",
         "--version",
         help="Print version and exit",

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import sai_logging as logging
+from argparse import Namespace
 
 from .args import get_arguments
 from .discord_notif import send_message
@@ -15,13 +16,21 @@ def _get_script_input() -> str:
         return temp_input if not temp_input[-1] == "\n" else temp_input[:-1]
     return None
 
-def _setup_log() -> logging.Logger:
-    log = logging.Logger()
+def _setup_log(args: Namespace) -> logging.Logger:
+    if args.log:
+        log = logging.Logger(
+            log_file=args.log,
+            log_stdout=True,
+        )
+    else:
+        log = logging.Logger(
+            log_stdout=True,
+        )
     return log
 
 
 def main() -> None:
-    args = get_arguments()
+    args: Namespace = get_arguments()
     if args.version:
         import pkg_resources
 
@@ -31,7 +40,7 @@ def main() -> None:
         )
         sys.exit(0)
     
-    log = _setup_log()
+    log = _setup_log(args)
 
     if not args.message:
         message = _get_script_input()
