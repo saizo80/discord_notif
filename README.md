@@ -26,6 +26,7 @@ pip install --extra-index-url https://git.saizo.gay/api/packages/saizo/pypi/simp
 
 ```python
 from discord_notif import send_message
+from sai_logging import Logger # optional
 
 status = send_message(
     message='message to send', # required
@@ -35,6 +36,7 @@ status = send_message(
     file='/path/to/attached/file', # optional
     filter=False, # optional
     url='discord webhook url', # optional
+    log=Logger() # optional
 )
 
 
@@ -60,7 +62,7 @@ the script can also be called from the terminal. the functions are the same, but
 it will give this information:
 
 ```txt
-usage: discord_notif [-h] [-o OPTION] [-f FILE] [--filter] [-m MESSAGE] [-s STATUS] [-t TITLE] [-u URL] [-V]
+usage: discord_notif [-h] [-o OPTION] [-f FILE] [-m MESSAGE] [-s STATUS] [-t TITLE] [-u URL] [-l LOG] [-V]
 
 Send a message to discord
 
@@ -69,7 +71,6 @@ options:
   -o OPTION, --option OPTION
                         Option to send to discord webhook
   -f FILE, --file FILE  File to send to discord webhook
-  --filter              Filter the message to remove cli formatting
   -m MESSAGE, --message MESSAGE
                         Message to send to discord webhook
   -s STATUS, --status STATUS
@@ -77,6 +78,7 @@ options:
   -t TITLE, --title TITLE
                         Title of the message to send to discord webhook
   -u URL, --url URL     URL of the webhook to send to
+  -l LOG, --log LOG     log file to output to
   -V, --version         Print version and exit
 ```
 

@@ -122,6 +122,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.build
 env/
 venv/
 ENV/
@@ -174,3 +175,6 @@ discord.json
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# test script folder
+test/

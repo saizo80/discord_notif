@@ -30,12 +30,6 @@ def get_arguments() -> argparse.Namespace:
         default=None,
     )
     parser.add_argument(
-        "--filter",
-        help="Filter the message to remove cli formatting",
-        required=False,
-        action="store_true",
-    )
-    parser.add_argument(
         "-m",
         "--message",
         help="Message to send to discord webhook",
@@ -62,6 +56,14 @@ def get_arguments() -> argparse.Namespace:
         "-u",
         "--url",
         help="URL of the webhook to send to",
+        required=False,
+        default=None,
+        type=str,
+    )
+    parser.add_argument(
+        "-l",
+        "--log",
+        help="log file to output to",
         required=False,
         default=None,
         type=str,
