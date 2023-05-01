@@ -4,22 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "discord_notif"
-version = "0.2.4"
-authors = [{name="saizo", email="saizo@simplemail.is"}]
-description = "importable script to send messages to discord webhooks"
-readme = "README.md"
+version = "0.2.5"
 requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Operating System :: OS Independent",
-]
 dependencies = [
     "certifi==2022.12.7",
     "charset-normalizer==3.1.0",
     "discord-webhook==1.1.0",
     "idna==3.4",
-    "sai_logging==0.2.0",
+    "sai_logging==0.2.1",
     "requests==2.28.2",
     "urllib3==1.26.15",
 ]
@@ -28,4 +20,5 @@ dependencies = [
 discord_notif = "discord_notif.__main__:main"
 
 [project.urls]
-homepage = "https://git.saizo.gay/saizo/discord_notif"
+index = "https://git.saizo.gay/api/packages/saizo/pypi/simple/"
+git = "https://git.saizo/gay/saizo/discord_notif.git"
