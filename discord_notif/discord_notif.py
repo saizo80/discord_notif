@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import json
 import os
 from datetime import datetime
@@ -145,15 +145,19 @@ def send_message(
     log: logging.Logger | None = None,
 ) -> str:
     """Send message to discord webhook
+
+    `option` and `url` are mutually exclusive: if `url` is passed, `option` is ignored,
+    however one of them **must** be given
+
     Arguments:
-        message {str} -- Message to send to discord webhook
-        option {str} -- Option to send to discord webhook (choices: cron, alert, signout, test)
+        :param message {str} -- Message to send to discord webhook
     Keyword Arguments:
-        status {str} -- Status of the script to send to discord webhook (default: {None})
-        title {str} -- Title of the message to send to discord webhook (default: {None})
-        file {str} -- File to send to discord webhook (default: {None})
-        url {str} -- Url to send to discord webhook (default: {None})
-        logging {log.Logger} -- Logger to use (default: {None})
+        :param option {str} -- Option to send to discord webhook
+        :param status {str} -- Status of the script to send to discord webhook (default: {None})
+        :param title {str} -- Title of the message to send to discord webhook (default: {None})
+        :param file {str} -- File to send to discord webhook (default: {None})
+        :param url {str} -- Url to send to discord webhook (default: {None})
+        :param logging {log.Logger} -- Logger to use (default: {None})
 
     Returns:
         str -- Status of the message sent to discord webhook"""
